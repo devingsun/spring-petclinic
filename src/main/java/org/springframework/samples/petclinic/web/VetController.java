@@ -18,7 +18,6 @@ package org.springframework.samples.petclinic.web;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.samples.petclinic.model.Vets;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.stereotype.Controller;
@@ -42,7 +41,7 @@ public class VetController {
         this.clinicService = clinicService;
     }
 
-    @RequestMapping(value = {"/vets.html"})
+    @RequestMapping(value = { "/vets.html"})
     public String showVetList(Map<String, Object> model) {
         // Here we are returning an object of type 'Vets' rather than a collection of Vet objects
         // so it is simpler for Object-Xml mapping
@@ -52,7 +51,7 @@ public class VetController {
         return "vets/vetList";
     }
 
-    @RequestMapping(value = {"/vets.json", "/vets.xml"})
+    @RequestMapping(value = { "/vets.json", "/vets.xml"})
     public
     @ResponseBody
     Vets showResourcesVetList() {
