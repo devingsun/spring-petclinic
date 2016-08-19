@@ -4,12 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,7 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Colin But
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(VisitController.class)
+@ContextConfiguration({"classpath:spring/mvc-core-config.xml", "classpath:spring/mvc-test-config.xml"})
+@WebAppConfiguration
 public class VisitControllerTests {
 
     private static final int TEST_PET_ID = 1;
@@ -31,16 +33,16 @@ public class VisitControllerTests {
     private VisitController visitController;
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
     private ClinicService clinicService;
 
+    private MockMvc mockMvc;
+
     @Before
-    public void init() {
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(visitController).build();
+
         given(this.clinicService.findPetById(TEST_PET_ID)).willReturn(new Pet());
     }
-
 
     @Test
     public void testInitNewVisitForm() throws Exception {

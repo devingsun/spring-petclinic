@@ -5,16 +5,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,10 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Colin But
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(value = PetController.class,
-    includeFilters = @ComponentScan.Filter(
-                            value = PetTypeFormatter.class,
-                            type = FilterType.ASSIGNABLE_TYPE))
+@ContextConfiguration({"classpath:spring/mvc-core-config.xml", "classpath:spring/mvc-test-config.xml"})
+@WebAppConfiguration
 public class PetControllerTests {
 
     private static final int TEST_OWNER_ID = 1;
@@ -40,20 +38,26 @@ public class PetControllerTests {
     private PetController petController;
 
     @Autowired
-    private MockMvc mockMvc;
+    private FormattingConversionServiceFactoryBean formattingConversionServiceFactoryBean;
 
-    @MockBean
+    @Autowired
     private ClinicService clinicService;
+
+    private MockMvc mockMvc;
 
     @Before
     public void setup() {
+        this.mockMvc = MockMvcBuilders
+            .standaloneSetup(petController)
+            .setConversionService(formattingConversionServiceFactoryBean.getObject())
+            .build();
+
         PetType cat = new PetType();
         cat.setId(3);
         cat.setName("hamster");
         given(this.clinicService.findPetTypes()).willReturn(Lists.newArrayList(cat));
         given(this.clinicService.findOwnerById(TEST_OWNER_ID)).willReturn(new Owner());
         given(this.clinicService.findPetById(TEST_PET_ID)).willReturn(new Pet());
-
     }
 
     @Test
