@@ -36,7 +36,7 @@ public class Person extends BaseEntity {
 	private String lastName;
 
 	@Column(name = "age")
-	private int age;
+	private int age ;
 
 	public String getFirstName() {
 		return this.firstName;
